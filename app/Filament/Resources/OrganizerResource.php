@@ -19,6 +19,8 @@ class OrganizerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -47,8 +49,7 @@ class OrganizerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
+                    ->limit(100),
             ])
             ->filters([DateRangeFilter::make('created_at')]);
     }

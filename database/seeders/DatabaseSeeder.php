@@ -20,20 +20,20 @@ class DatabaseSeeder extends Seeder
             ]);
         $this->call(PermissionsSeeder::class);
 
-        // $this->call(AnnouncementSeeder::class);
-        // $this->call(CheckSeeder::class);
-        // $this->call(CounterSeeder::class);
-        // $this->call(DepartmentSeeder::class);
+        $this->call(AnnouncementSeeder::class);
+        $this->call(CheckSeeder::class);
+        $this->call(CounterSeeder::class);
+        $this->call(DepartmentSeeder::class);
         // $this->call(FeedbackSeeder::class);
-        // $this->call(ManualPaymentSeeder::class);
-        // $this->call(OnlinePaymentSeeder::class);
-        // $this->call(OrganizerSeeder::class);
-        // $this->call(ParticipantSeeder::class);
-        // $this->call(ProgramSeeder::class);
-        // $this->call(ReferenceSeeder::class);
-        // $this->call(StaffSeeder::class);
-        // $this->call(StationSeeder::class);
-        // $this->call(TransactionSeeder::class);
-        // $this->call(UserSeeder::class);
+        $this->call(ManualPaymentSeeder::class);
+        $this->call(OnlinePaymentSeeder::class);
+        $this->call(OrganizerSeeder::class);
+        $this->call(ParticipantSeeder::class);
+        $this->call(ProgramSeeder::class);
+        $this->call(ReferenceSeeder::class);
+        $this->call(StaffSeeder::class);
+        $this->call(StationSeeder::class);
+        $this->call(TransactionSeeder::class);
+        $this->call(UserSeeder::class);
     }
 }

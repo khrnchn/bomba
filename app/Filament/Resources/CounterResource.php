@@ -22,6 +22,8 @@ class CounterResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-desktop-computer';
 
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -52,13 +54,16 @@ class CounterResource extends Resource
                         ]),
 
                     Toggle::make('isCheckIn')
+                        ->helperText('Set whether it is a check in counter.')
                         ->rules(['boolean'])
                         ->required()
+                        ->inline(false)
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
                             'lg' => 12,
                         ]),
+
                 ]),
             ]),
         ]);
