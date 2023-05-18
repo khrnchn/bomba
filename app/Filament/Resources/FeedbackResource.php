@@ -22,6 +22,8 @@ class FeedbackResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-list';
 
+    protected static ?int $navigationSort = 5;
+
     protected static ?string $recordTitleAttribute = 'comment';
 
     public static function form(Form $form): Form

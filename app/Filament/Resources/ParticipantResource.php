@@ -18,6 +18,8 @@ class ParticipantResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $recordTitleAttribute = 'id';
 
     public static function form(Form $form): Form
