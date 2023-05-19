@@ -94,7 +94,7 @@ class StaffResource extends Resource
                     ->limit(50),
                 Tables\Columns\TextColumn::make('referral_code')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
             ])
             ->filters([

@@ -19,6 +19,8 @@ class Feedback extends Model
         'feedback_photo_path',
     ];
 
+    protected $table = 'feedbacks';
+
     protected $searchableFields = ['*'];
 
     public function program()

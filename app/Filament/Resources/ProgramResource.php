@@ -124,7 +124,7 @@ class ProgramResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // ProgramResource\RelationManagers\FeedbacksRelationManager::class,
+            ProgramResource\RelationManagers\FeedbacksRelationManager::class,
             ProgramResource\RelationManagers\CountersRelationManager::class,
             ProgramResource\RelationManagers\ChecksRelationManager::class,
             ProgramResource\RelationManagers\ParticipantsRelationManager::class,

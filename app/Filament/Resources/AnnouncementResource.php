@@ -11,6 +11,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\AnnouncementResource\Pages;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
 
 class AnnouncementResource extends Resource
 {
@@ -39,7 +41,7 @@ class AnnouncementResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('description')
+                    Textarea::make('description')
                         ->rules(['max:255', 'string'])
                         ->required()
                         ->placeholder('Description')
@@ -49,20 +51,18 @@ class AnnouncementResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    RichEditor::make('image_path')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Image Path')
+                    FileUpload::make('image_path')
+                        ->label('Announcement Image')
+                        ->placeholder('Upload announcement image')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
                             'lg' => 12,
                         ]),
 
-                    RichEditor::make('file_path')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('File Path')
+                    FileUpload::make('file_path')
+                        ->label('Announcement File')
+                        ->placeholder('Upload announcement file')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -80,19 +80,11 @@ class AnnouncementResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('image_path')
-                    ->toggleable()
-                    ->searchable()
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('file_path')
-                    ->toggleable()
-                    ->searchable()
+                    
                     ->limit(50),
             ])
             ->filters([DateRangeFilter::make('created_at')]);

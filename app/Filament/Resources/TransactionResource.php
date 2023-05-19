@@ -85,14 +85,14 @@ class TransactionResource extends Resource
                     ->limit(50),
                 Tables\Columns\TextColumn::make('amount')
                     ->toggleable()
-                    ->searchable(true, null, true),
+                    ,
                 Tables\Columns\TextColumn::make('transactionable_id')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
                 Tables\Columns\TextColumn::make('transactionable_type')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
             ])
             ->filters([

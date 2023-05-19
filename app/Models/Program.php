@@ -41,11 +41,10 @@ class Program extends Model
         return $this->belongsTo(Organizer::class);
     }
 
-    // ada error
-    // public function feedbacks()
-    // {
-    //     return $this->hasMany(Feedback::class);
-    // }
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class);
+    }
 
     public function counters()
     {

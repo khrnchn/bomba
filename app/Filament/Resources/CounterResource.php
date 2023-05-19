@@ -79,7 +79,7 @@ class CounterResource extends Resource
                     ->limit(50),
                 Tables\Columns\TextColumn::make('name')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
                 Tables\Columns\IconColumn::make('isCheckIn')
                     ->toggleable()

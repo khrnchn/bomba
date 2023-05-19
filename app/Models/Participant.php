@@ -26,6 +26,15 @@ class Participant extends Model
         'isMalaysian' => 'boolean',
     ];
 
+    public function getIsMalaysianNameAttribute()
+    {
+        if ($this->isMalaysian) {
+            return 'Yes';
+        }
+
+        return 'No';
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

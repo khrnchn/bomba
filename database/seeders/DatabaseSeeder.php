@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,7 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CheckSeeder::class);
         $this->call(CounterSeeder::class);
         $this->call(DepartmentSeeder::class);
-        // $this->call(FeedbackSeeder::class);
+        $this->call(FeedbackSeeder::class);
         $this->call(ManualPaymentSeeder::class);
         $this->call(OnlinePaymentSeeder::class);
         $this->call(OrganizerSeeder::class);
@@ -35,5 +36,7 @@ class DatabaseSeeder extends Seeder
         $this->call(StationSeeder::class);
         $this->call(TransactionSeeder::class);
         $this->call(UserSeeder::class);
+
+        Artisan::call('world:init');
     }
 }

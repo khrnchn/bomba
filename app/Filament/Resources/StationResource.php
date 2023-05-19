@@ -67,15 +67,15 @@ class StationResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
                 Tables\Columns\TextColumn::make('world_city_id')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
                 Tables\Columns\TextColumn::make('world_division_id')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    
                     ->limit(50),
             ])
             ->filters([DateRangeFilter::make('created_at')]);

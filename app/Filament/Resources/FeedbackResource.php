@@ -13,6 +13,12 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\FeedbackResource\Pages;
+use App\Models\Participant;
+use App\Models\User;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Eloquent\Model;
 
 class FeedbackResource extends Resource
 {
@@ -30,61 +36,64 @@ class FeedbackResource extends Resource
     {
         return $form->schema([
             Card::make()->schema([
-                Grid::make(['default' => 0])->schema([
-                    Select::make('program_id')
-                        ->rules(['exists:programs,id'])
-                        ->required()
-                        ->relationship('program', 'name')
-                        ->searchable()
-                        ->placeholder('Program')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                Select::make('program_id')
+                    ->rules(['exists:programs,id'])
+                    ->required()
+                    ->relationship('program', 'name')
+                    ->searchable()
+                    ->placeholder('Program')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
-                    Select::make('participant_id')
-                        ->rules(['exists:participants,id'])
-                        ->required()
-                        ->relationship('participant', 'id')
-                        ->searchable()
-                        ->placeholder('Participant')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                Select::make('participant_id')
+                    ->rules(['exists:participants,id'])
+                    ->required()
+                    ->relationship('participant', 'id')
+                    ->searchable()
+                    ->placeholder('Participant')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
-                    TextInput::make('comment')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Comment')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                Textarea::make('comment')
+                    ->rules(['max:255', 'string'])
+                    ->required()
+                    ->placeholder('Comment')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
-                    TextInput::make('rating')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Rating')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                Select::make('rating')
+                    ->required()
+                    ->placeholder('Rating')
+                    ->options([
+                        'very satisfied' => 'Very Satisfied',
+                        'satisfied' => 'Satisfied',
+                        'neutral' => 'Neutral',
+                        'dissatisfied' => 'Dissatisfied',
+                        'very dissatisfied' => 'Very Dissatisfied',
+                    ])
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
-                    RichEditor::make('feedback_photo_path')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Feedback Photo Path')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-                ]),
+                FileUpload::make('feedback_photo_path')
+                    ->label('Feedback Image')
+                    ->placeholder('Feedback image (If any)')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
             ]),
         ]);
     }
@@ -99,18 +108,17 @@ class FeedbackResource extends Resource
                     ->limit(50),
                 Tables\Columns\TextColumn::make('participant.id')
                     ->toggleable()
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('comment')
-                    ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
+                    ->limit(50)
+                    ->getStateUsing(function (Model $record) {
+                        $participantId = $record->participant_id;
+                        $userId = Participant::where('id', $participantId)->value('user_id');
+                        $name = User::where('id', $userId)->value('name');
+
+                        return $name;
+                    }),
                 Tables\Columns\TextColumn::make('rating')
                     ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('feedback_photo_path')
-                    ->toggleable()
-                    ->searchable()
+                    
                     ->limit(50),
             ])
             ->filters([
