@@ -10,6 +10,9 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\OrganizerResource\Pages;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class OrganizerResource extends Resource
 {
@@ -47,11 +50,23 @@ class OrganizerResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(100),
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([DateRangeFilter::make('created_at')])
+            ->bulkActions([
+                
+            ]);
     }
 
     public static function getRelations(): array
@@ -66,7 +81,7 @@ class OrganizerResource extends Resource
         return [
             'index' => Pages\ListOrganizers::route('/'),
             'create' => Pages\CreateOrganizer::route('/create'),
-            'view' => Pages\ViewOrganizer::route('/{record}'),
+            // 'view' => Pages\ViewOrganizer::route('/{record}'),
             'edit' => Pages\EditOrganizer::route('/{record}/edit'),
         ];
     }

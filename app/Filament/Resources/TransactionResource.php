@@ -12,6 +12,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\TransactionResource\Pages;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class TransactionResource extends Resource
 {
@@ -80,11 +83,21 @@ class TransactionResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('amount')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ,
                 Tables\Columns\TextColumn::make('transactionable_id')
                     ->toggleable()
@@ -103,6 +116,9 @@ class TransactionResource extends Resource
                     ->indicator('User')
                     ->multiple()
                     ->label('User'),
+            ])
+            ->bulkActions([
+                
             ]);
     }
 
@@ -116,7 +132,7 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             'create' => Pages\CreateTransaction::route('/create'),
-            'view' => Pages\ViewTransaction::route('/{record}'),
+            // 'view' => Pages\ViewTransaction::route('/{record}'),
             'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }

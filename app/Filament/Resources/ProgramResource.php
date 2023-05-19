@@ -17,7 +17,10 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
 use Khsing\World\Models\Division;
+use stdClass;
 
 class ProgramResource extends Resource
 {
@@ -101,24 +104,35 @@ class ProgramResource extends Resource
             ->poll('60s')
             ->columns([
 
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
+                    ->sortable()
+                    ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('organizer.name')
-                    ->toggleable()
+                    ->sortable()
+                    ->searchable()
                     ->limit(30),
 
                 Tables\Columns\TextColumn::make('start_date')
-                    ->toggleable()
+                    ->sortable()
                     ->dateTime(),
 
                 Tables\Columns\TextColumn::make('end_date')
-                    ->toggleable()
+                    ->sortable()
                     ->dateTime(),
 
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([DateRangeFilter::make('created_at')])
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -136,7 +150,7 @@ class ProgramResource extends Resource
         return [
             'index' => Pages\ListPrograms::route('/'),
             'create' => Pages\CreateProgram::route('/create'),
-            'view' => Pages\ViewProgram::route('/{record}'),
+            // 'view' => Pages\ViewProgram::route('/{record}'),
             'edit' => Pages\EditProgram::route('/{record}/edit'),
         ];
     }

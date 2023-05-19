@@ -18,7 +18,10 @@ use App\Models\User;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Model;
+use stdClass;
 
 class FeedbackResource extends Resource
 {
@@ -103,11 +106,20 @@ class FeedbackResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('program.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('participant.id')
-                    ->toggleable()
+                ->sortable()
                     ->limit(50)
                     ->getStateUsing(function (Model $record) {
                         $participantId = $record->participant_id;
@@ -117,8 +129,7 @@ class FeedbackResource extends Resource
                         return $name;
                     }),
                 Tables\Columns\TextColumn::make('rating')
-                    ->toggleable()
-                    
+                ->sortable()
                     ->limit(50),
             ])
             ->filters([
@@ -135,6 +146,9 @@ class FeedbackResource extends Resource
                     ->indicator('Participant')
                     ->multiple()
                     ->label('Participant'),
+            ])
+            ->bulkActions([
+                
             ]);
     }
 
@@ -148,7 +162,7 @@ class FeedbackResource extends Resource
         return [
             'index' => Pages\ListFeedbacks::route('/'),
             'create' => Pages\CreateFeedback::route('/create'),
-            'view' => Pages\ViewFeedback::route('/{record}'),
+            // 'view' => Pages\ViewFeedback::route('/{record}'),
             'edit' => Pages\EditFeedback::route('/{record}/edit'),
         ];
     }

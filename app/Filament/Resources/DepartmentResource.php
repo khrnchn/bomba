@@ -10,6 +10,9 @@ use Filament\Forms\Components\Card;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\DepartmentResource\Pages;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class DepartmentResource extends Resource
 {
@@ -43,11 +46,23 @@ class DepartmentResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(100),
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([DateRangeFilter::make('created_at')])
+            ->bulkActions([
+                
+            ]);
     }
 
     public static function getRelations(): array
@@ -62,7 +77,7 @@ class DepartmentResource extends Resource
         return [
             'index' => Pages\ListDepartments::route('/'),
             'create' => Pages\CreateDepartment::route('/create'),
-            'view' => Pages\ViewDepartment::route('/{record}'),
+            // 'view' => Pages\ViewDepartment::route('/{record}'),
             'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
     }

@@ -13,6 +13,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\CounterResource\Pages;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class CounterResource extends Resource
 {
@@ -74,15 +77,24 @@ class CounterResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('program.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
+                ->sortable()
                     
                     ->limit(50),
                 Tables\Columns\IconColumn::make('isCheckIn')
-                    ->toggleable()
+                ->sortable()
                     ->boolean(),
             ])
             ->filters([
@@ -93,6 +105,8 @@ class CounterResource extends Resource
                     ->indicator('Program')
                     ->multiple()
                     ->label('Program'),
+            ])->bulkActions([
+                
             ]);
     }
 
@@ -109,7 +123,7 @@ class CounterResource extends Resource
         return [
             'index' => Pages\ListCounters::route('/'),
             'create' => Pages\CreateCounter::route('/create'),
-            'view' => Pages\ViewCounter::route('/{record}'),
+            // 'view' => Pages\ViewCounter::route('/{record}'),
             'edit' => Pages\EditCounter::route('/{record}/edit'),
         ];
     }

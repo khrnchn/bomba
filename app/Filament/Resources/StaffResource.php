@@ -12,6 +12,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\StaffResource\Pages;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class StaffResource extends Resource
 {
@@ -83,18 +86,29 @@ class StaffResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('station.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('department.name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('referral_code')
-                    ->toggleable()
-                    
+                ->sortable()
+                ->searchable()
                     ->limit(50),
             ])
             ->filters([
@@ -117,6 +131,9 @@ class StaffResource extends Resource
                     ->indicator('Department')
                     ->multiple()
                     ->label('Department'),
+            ])
+            ->bulkActions([
+                
             ]);
     }
 
@@ -133,7 +150,7 @@ class StaffResource extends Resource
         return [
             'index' => Pages\ListAllStaff::route('/'),
             'create' => Pages\CreateStaff::route('/create'),
-            'view' => Pages\ViewStaff::route('/{record}'),
+            // 'view' => Pages\ViewStaff::route('/{record}'),
             'edit' => Pages\EditStaff::route('/{record}/edit'),
         ];
     }

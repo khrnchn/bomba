@@ -12,9 +12,11 @@ use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\StationResource\Pages;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Model;
 use Khsing\World\Models\City;
 use Khsing\World\Models\Division;
+use stdClass;
 
 class StationResource extends Resource
 {
@@ -82,8 +84,17 @@ class StationResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
+                ->sortable()
+                ->searchable()
                     ->limit(50),
 
                 TextColumn::make('world_division_id')
@@ -108,7 +119,10 @@ class StationResource extends Resource
 
 
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([DateRangeFilter::make('created_at')])
+            ->bulkActions([
+                
+            ]);
     }
 
     public static function getRelations(): array
@@ -123,7 +137,7 @@ class StationResource extends Resource
         return [
             'index' => Pages\ListStations::route('/'),
             'create' => Pages\CreateStation::route('/create'),
-            'view' => Pages\ViewStation::route('/{record}'),
+            // 'view' => Pages\ViewStation::route('/{record}'),
             'edit' => Pages\EditStation::route('/{record}/edit'),
         ];
     }

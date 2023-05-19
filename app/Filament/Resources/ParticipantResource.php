@@ -15,9 +15,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Khsing\World\Models\Country;
 use Khsing\World\Models\Division;
+use stdClass;
 
 class ParticipantResource extends Resource
 {
@@ -35,6 +38,7 @@ class ParticipantResource extends Resource
     {
         return $form->schema([
             Card::make()->schema([
+
                 Toggle::make('isMalaysian')
                     ->required()
                     ->label('Is Malaysian')
@@ -56,7 +60,7 @@ class ParticipantResource extends Resource
                     ->afterStateUpdated(fn (callable $set) => $set('division_id', null)),
 
                 Select::make('division_id')
-                    ->label('Division')
+                    ->label('State')
                     ->searchable()
                     ->options(function (callable $get) {
                         $country = Country::find($get('country_id'));
@@ -78,8 +82,17 @@ class ParticipantResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
                 TextColumn::make('user.name')
                     ->label('Name')
+                    ->sortable()
                     ->limit(50),
 
                 BadgeColumn::make('is_malaysian_name')
@@ -100,7 +113,7 @@ class ParticipantResource extends Resource
                     }),
 
                 TextColumn::make('world_division_id')
-                    ->label('Division')
+                    ->label('State')
                     ->limit(50)
                     ->getStateUsing(function (Model $record) {
                         $divisionId = $record->world_division_id;
@@ -109,7 +122,11 @@ class ParticipantResource extends Resource
                         return $name;
                     }),
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([
+                DateRangeFilter::make('created_at'),
+
+            ])
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -126,7 +143,7 @@ class ParticipantResource extends Resource
         return [
             'index' => Pages\ListParticipants::route('/'),
             'create' => Pages\CreateParticipant::route('/create'),
-            'view' => Pages\ViewParticipant::route('/{record}'),
+            // 'view' => Pages\ViewParticipant::route('/{record}'),
             'edit' => Pages\EditParticipant::route('/{record}/edit'),
         ];
     }

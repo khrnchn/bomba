@@ -13,6 +13,9 @@ use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\AnnouncementResource\Pages;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use stdClass;
 
 class AnnouncementResource extends Resource
 {
@@ -78,16 +81,28 @@ class AnnouncementResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
+                TextColumn::make('no')->getStateUsing(
+                    static function (stdClass $rowLoop, HasTable $livewire): string {
+                        return (string) ($rowLoop->iteration +
+                            ($livewire->tableRecordsPerPage * ($livewire->page - 1
+                            ))
+                        );
+                    }
+                ),
+
                 Tables\Columns\TextColumn::make('title')
-                    ->toggleable()
-                    
+                    ->searchable()
+                    ->sortable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('description')
-                    ->toggleable()
+  
                     
                     ->limit(50),
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([DateRangeFilter::make('created_at')])
+            ->bulkActions([
+                
+            ]);
     }
 
     public static function getRelations(): array
@@ -100,7 +115,7 @@ class AnnouncementResource extends Resource
         return [
             'index' => Pages\ListAnnouncements::route('/'),
             'create' => Pages\CreateAnnouncement::route('/create'),
-            'view' => Pages\ViewAnnouncement::route('/{record}'),
+            // 'view' => Pages\ViewAnnouncement::route('/{record}'),
             'edit' => Pages\EditAnnouncement::route('/{record}/edit'),
         ];
     }
