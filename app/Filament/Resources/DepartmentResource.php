@@ -9,6 +9,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\DepartmentResource\Pages;
+use Filament\Forms\Components\TextInput;
 
 class DepartmentResource extends Resource
 {
@@ -23,7 +24,17 @@ class DepartmentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([Grid::make(['default' => 0])->schema([])]),
+            Card::make()->schema([Grid::make(['default' => 0])->schema([
+                TextInput::make('name')
+                    ->rules(['max:255', 'string'])
+                    ->required()
+                    ->placeholder('Name')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
+            ])]),
         ]);
     }
 
@@ -31,7 +42,11 @@ class DepartmentResource extends Resource
     {
         return $table
             ->poll('60s')
-            ->columns([])
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->toggleable()
+                    ->limit(100),
+            ])
             ->filters([DateRangeFilter::make('created_at')]);
     }
 

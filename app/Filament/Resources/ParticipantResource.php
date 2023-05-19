@@ -82,6 +82,13 @@ class ParticipantResource extends Resource
                     ->label('Name')
                     ->limit(50),
 
+                BadgeColumn::make('is_malaysian_name')
+                    ->label('Malaysian')
+                    ->colors([
+                        'success' => static fn ($state): bool => $state === 'Yes',
+                        'primary' => static fn ($state): bool => $state === 'No',
+                    ]),
+
                 TextColumn::make('world_country_id')
                     ->label('Country')
                     ->limit(50)
@@ -91,13 +98,6 @@ class ParticipantResource extends Resource
 
                         return $name;
                     }),
-
-                BadgeColumn::make('is_malaysian_name')
-                    ->label('Malaysian')
-                    ->colors([
-                        'success' => static fn ($state): bool => $state === 'Yes',
-                        'primary' => static fn ($state): bool => $state === 'No',
-                    ]),
 
                 TextColumn::make('world_division_id')
                     ->label('Division')

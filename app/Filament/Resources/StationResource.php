@@ -10,6 +10,11 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\StationResource\Pages;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
+use Khsing\World\Models\City;
+use Khsing\World\Models\Division;
 
 class StationResource extends Resource
 {
@@ -36,20 +41,32 @@ class StationResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('world_city_id')
-                        ->rules(['max:255'])
+                    Select::make('division_id')
+                        ->label('State')
+                        ->searchable()
                         ->required()
-                        ->placeholder('World City Id')
+                        ->reactive()
+                        ->options(Division::where('country_id', 87)->pluck('name', 'id')->toArray())
+                        ->afterStateUpdated(fn (callable $set) => $set('city_id', null))
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('world_division_id')
-                        ->rules(['max:255'])
+                    Select::make('city_id')
+                        ->label('City')
+                        ->searchable()
                         ->required()
-                        ->placeholder('World Division Id')
+                        ->options(function (callable $get) {
+                            $division = Division::find($get('division_id'));
+
+                            if (!$division) {
+                                return City::where('country_id', 87)->pluck('name', 'id')->toArray();
+                            }
+
+                            return $division->cities->pluck('name', 'id');
+                        })
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -67,16 +84,29 @@ class StationResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->toggleable()
-                    
                     ->limit(50),
-                Tables\Columns\TextColumn::make('world_city_id')
-                    ->toggleable()
-                    
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('world_division_id')
-                    ->toggleable()
-                    
-                    ->limit(50),
+
+                TextColumn::make('world_division_id')
+                    ->label('State')
+                    ->limit(50)
+                    ->getStateUsing(function (Model $record) {
+                        $divisionId = $record->world_division_id;
+                        $name = Division::where('id', $divisionId)->value('name');
+
+                        return $name;
+                    }),
+
+                TextColumn::make('world_city_id')
+                    ->label('City')
+                    ->limit(50)
+                    ->getStateUsing(function (Model $record) {
+                        $cityId = $record->world_city_id;
+                        $name = City::where('id', $cityId)->value('name');
+
+                        return $name;
+                    }),
+
+
             ])
             ->filters([DateRangeFilter::make('created_at')]);
     }
